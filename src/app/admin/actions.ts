@@ -54,7 +54,7 @@ export async function saveBranchAction(_prev: FormState, formData: FormData): Pr
   try {
     if (id) {
       await db()`
-        UPDATE branches SET
+        UPDATE review.branches SET
           name = ${name}, slug = ${slug}, google_review_url = ${reviewUrl},
           reward_text = ${rewardText}, voucher_valid_hours = ${validHours},
           cooldown_days = ${cooldownDays}, active = ${active},
@@ -64,7 +64,7 @@ export async function saveBranchAction(_prev: FormState, formData: FormData): Pr
         WHERE id = ${id}`;
     } else {
       await db()`
-        INSERT INTO branches (name, slug, google_review_url, reward_text, voucher_valid_hours,
+        INSERT INTO review.branches (name, slug, google_review_url, reward_text, voucher_valid_hours,
                               cooldown_days, staff_pin_hash, active)
         VALUES (${name}, ${slug}, ${reviewUrl}, ${rewardText}, ${validHours},
                 ${cooldownDays}, ${pinHash}, ${active})`;

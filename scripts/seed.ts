@@ -15,7 +15,7 @@ async function main() {
   const google = toGoogleReviewUrl(process.env.SEED_GOOGLE_PLACE_ID || KHULAFA_REVIEW_URL) ?? "";
 
   const rows = await sql`
-    INSERT INTO branches (slug, name, google_review_url, reward_text, staff_pin_hash)
+    INSERT INTO review.branches (slug, name, google_review_url, reward_text, staff_pin_hash)
     VALUES ('khulafa-bistro', 'Khulafa Bistro', ${google}, 'Free drink', ${hashPin(pin)})
     ON CONFLICT (slug) DO NOTHING
     RETURNING id`;

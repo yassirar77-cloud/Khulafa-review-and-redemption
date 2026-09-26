@@ -52,7 +52,7 @@ export async function claimVoucher(
     const [branch] = await sql<
       { id: number; reward_text: string; voucher_valid_hours: number; cooldown_days: number }[]
     >`SELECT id, reward_text, voucher_valid_hours, cooldown_days
-      FROM branches WHERE slug = ${branchSlug} AND active`;
+      FROM review.branches WHERE slug = ${branchSlug} AND active`;
     if (!branch) return { ok: false, error: "This branch is not taking part right now." };
 
     // Serialise claims for the same phone at the same branch so a double tap
@@ -60,7 +60,7 @@ export async function claimVoucher(
     await sql`SELECT pg_advisory_xact_lock(hashtext(${branch.id + ":" + phone}))`;
 
     const [recent] = await sql<Pick<Voucher, "code" | "created_at" | "expires_at" | "redeemed_at">[]>`
-      SELECT code, created_at, expires_at, redeemed_at FROM vouchers
+      SELECT code, created_at, expires_at, redeemed_at FROM review.vouchers
       WHERE branch_id = ${branch.id} AND phone = ${phone}
       ORDER BY created_at DESC LIMIT 1`;
 
@@ -79,7 +79,7 @@ export async function claimVoucher(
     for (let attempt = 0; attempt < 5; attempt++) {
       const code = generateCode();
       const rows = await sql<{ code: string }[]>`
-        INSERT INTO vouchers (code, branch_id, customer_name, phone, reward_text, expires_at)
+        INSERT INTO review.vouchers (code, branch_id, customer_name, phone, reward_text, expires_at)
         VALUES (${code}, ${branch.id}, ${name}, ${phone}, ${branch.reward_text},
                 now() + make_interval(hours => ${branch.voucher_valid_hours}))
         ON CONFLICT (code) DO NOTHING
@@ -94,7 +94,7 @@ export async function getVoucher(codeInput: string): Promise<VoucherWithBranch |
   const code = cleanCode(codeInput);
   const [row] = await db()<VoucherWithBranch[]>`
     SELECT v.*, b.name AS branch_name, b.slug AS branch_slug
-    FROM vouchers v JOIN branches b ON b.id = v.branch_id
+    FROM review.vouchers v JOIN review.branches b ON b.id = v.branch_id
     WHERE v.code = ${code}`;
   return row ?? null;
 }
@@ -112,7 +112,7 @@ export async function redeemVoucher(branchId: number, codeInput: string): Promis
   const code = cleanCode(codeInput);
   // Single conditional UPDATE so two tills can't redeem the same code.
   const [row] = await db()<Voucher[]>`
-    UPDATE vouchers SET redeemed_at = now()
+    UPDATE review.vouchers SET redeemed_at = now()
     WHERE code = ${code} AND branch_id = ${branchId}
       AND redeemed_at IS NULL AND expires_at > now()
     RETURNING *`;
@@ -124,7 +124,7 @@ export async function redeemVoucher(branchId: number, codeInput: string): Promis
 export async function listRecentVouchers(limit: number, branchId?: number): Promise<VoucherWithBranch[]> {
   return db()<VoucherWithBranch[]>`
     SELECT v.*, b.name AS branch_name, b.slug AS branch_slug
-    FROM vouchers v JOIN branches b ON b.id = v.branch_id
+    FROM review.vouchers v JOIN review.branches b ON b.id = v.branch_id
     ${branchId ? db()`WHERE v.branch_id = ${branchId}` : db()``}
     ORDER BY v.created_at DESC LIMIT ${limit}`;
 }

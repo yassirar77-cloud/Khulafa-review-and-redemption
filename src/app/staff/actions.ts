@@ -25,7 +25,7 @@ export async function staffLoginAction(_prev: LoginState, formData: FormData): P
 
   if (!checkPin(pin, branch.staff_pin_hash)) {
     await db()`
-      UPDATE branches SET
+      UPDATE review.branches SET
         failed_pin_attempts = CASE WHEN failed_pin_attempts + 1 >= ${MAX_ATTEMPTS} THEN 0 ELSE failed_pin_attempts + 1 END,
         pin_locked_until = CASE WHEN failed_pin_attempts + 1 >= ${MAX_ATTEMPTS}
           THEN now() + make_interval(mins => ${LOCK_MINUTES}) ELSE pin_locked_until END
@@ -33,7 +33,7 @@ export async function staffLoginAction(_prev: LoginState, formData: FormData): P
     return { error: "Wrong PIN." };
   }
 
-  await db()`UPDATE branches SET failed_pin_attempts = 0, pin_locked_until = NULL WHERE id = ${branch.id}`;
+  await db()`UPDATE review.branches SET failed_pin_attempts = 0, pin_locked_until = NULL WHERE id = ${branch.id}`;
   await startStaffSession(branch.id);
   redirect("/staff");
 }

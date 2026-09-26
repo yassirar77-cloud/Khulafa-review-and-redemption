@@ -51,12 +51,14 @@ In the branch settings, paste either:
 
 ### Deploying (Vercel + Supabase)
 
-1. Create a Supabase project. Copy the **Transaction pooler** connection string (Project Settings → Database).
+1. Create a Supabase project. Copy the **Transaction pooler** connection string (the **Connect** button at the top of the project).
 2. Run `npm run db:migrate` and `npm run db:seed` once with that `DATABASE_URL`.
-3. Import this repo in Vercel and set the environment variables `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET` and `PUBLIC_BASE_URL` (your final domain).
+3. Import this repo in Vercel and set the environment variables `DATABASE_URL`, `ADMIN_PASSWORD` and `PUBLIC_BASE_URL` (your final domain). `SESSION_SECRET` is optional.
 4. Open `/admin`, check the branch, then print the QR poster.
 
 Set `PUBLIC_BASE_URL` before printing posters. The QR codes contain that address, so it shouldn't change afterwards.
+
+All tables live in a separate `review` schema, so the app can share a Supabase database with other apps without touching their tables.
 
 ## Adding more branches
 

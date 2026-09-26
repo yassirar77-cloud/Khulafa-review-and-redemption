@@ -56,18 +56,18 @@ describe("vouchers", { skip: !url && "TEST_DATABASE_URL not set" }, () => {
 
   before(async () => {
     const sql = db();
-    await sql`DROP TABLE IF EXISTS events, vouchers, branches CASCADE`;
+    await sql`DROP TABLE IF EXISTS review.events, review.vouchers, review.branches CASCADE`;
     await sql.unsafe(readFileSync(join(__dirname, "..", "db", "schema.sql"), "utf8"));
   });
 
   beforeEach(async () => {
     const sql = db();
-    await sql`TRUNCATE events, vouchers, branches RESTART IDENTITY CASCADE`;
+    await sql`TRUNCATE review.events, review.vouchers, review.branches RESTART IDENTITY CASCADE`;
     [{ id: branchA }] = await sql`
-      INSERT INTO branches (slug, name, reward_text, cooldown_days)
+      INSERT INTO review.branches (slug, name, reward_text, cooldown_days)
       VALUES ('a', 'Branch A', 'Free drink', 30) RETURNING id`;
     [{ id: branchB }] = await sql`
-      INSERT INTO branches (slug, name, reward_text, cooldown_days)
+      INSERT INTO review.branches (slug, name, reward_text, cooldown_days)
       VALUES ('b', 'Branch B', 'Free teh tarik', 30) RETURNING id`;
   });
 
@@ -98,7 +98,7 @@ describe("vouchers", { skip: !url && "TEST_DATABASE_URL not set" }, () => {
     );
     const codes = new Set(results.map((r) => (r.ok ? r.code : "error")));
     assert.equal(codes.size, 1);
-    const [{ count }] = await db()`SELECT count(*)::int AS count FROM vouchers`;
+    const [{ count }] = await db()`SELECT count(*)::int AS count FROM review.vouchers`;
     assert.equal(count, 1);
   });
 
@@ -118,7 +118,7 @@ describe("vouchers", { skip: !url && "TEST_DATABASE_URL not set" }, () => {
   });
 
   test("cooldown of 0 days allows claiming again once redeemed", async () => {
-    await db()`UPDATE branches SET cooldown_days = 0 WHERE id = ${branchA}`;
+    await db()`UPDATE review.branches SET cooldown_days = 0 WHERE id = ${branchA}`;
     const first = await claimVoucher("a", "Ali", "0123456789");
     assert.ok(first.ok);
     await redeemVoucher(branchA, first.code);
@@ -143,14 +143,14 @@ describe("vouchers", { skip: !url && "TEST_DATABASE_URL not set" }, () => {
     assert.equal(wrong.ok, false);
     assert.match(!wrong.ok ? wrong.error : "", /different branch/);
 
-    await db()`UPDATE vouchers SET expires_at = now() - interval '1 minute'`;
+    await db()`UPDATE review.vouchers SET expires_at = now() - interval '1 minute'`;
     const expired = await redeemVoucher(branchA, res.code);
     assert.equal(expired.ok, false);
     assert.match(!expired.ok ? expired.error : "", /Expired/);
   });
 
   test("inactive branches and bad input are rejected", async () => {
-    await db()`UPDATE branches SET active = false WHERE id = ${branchA}`;
+    await db()`UPDATE review.branches SET active = false WHERE id = ${branchA}`;
     assert.equal((await claimVoucher("a", "Ali", "0123456789")).ok, false);
     assert.equal((await claimVoucher("b", "", "0123456789")).ok, false);
     assert.equal((await claimVoucher("b", "Ali", "123")).ok, false);

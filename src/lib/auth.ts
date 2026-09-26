@@ -2,10 +2,19 @@ import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from
 
 export type Session = { role: "admin" } | { role: "staff"; branchId: number };
 
+/**
+ * Key for signing login cookies. SESSION_SECRET is optional: without it the key
+ * is derived from DATABASE_URL, which already holds the database password.
+ */
 function secret(): string {
   const s = process.env.SESSION_SECRET;
-  if (!s || s.length < 16) throw new Error("SESSION_SECRET must be set (at least 16 characters)");
-  return s;
+  if (s) {
+    if (s.length < 16) throw new Error("SESSION_SECRET must be at least 16 characters");
+    return s;
+  }
+  const db = process.env.DATABASE_URL;
+  if (!db) throw new Error("Set SESSION_SECRET or DATABASE_URL");
+  return createHash("sha256").update("khulafa-session:" + db).digest("hex");
 }
 
 function mac(body: string): string {

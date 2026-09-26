@@ -23,38 +23,38 @@ export type BranchStats = Branch & {
 };
 
 export async function getBranchBySlug(slug: string): Promise<Branch | null> {
-  const [row] = await db()<Branch[]>`SELECT * FROM branches WHERE slug = ${slug}`;
+  const [row] = await db()<Branch[]>`SELECT * FROM review.branches WHERE slug = ${slug}`;
   return row ?? null;
 }
 
 export async function getBranchById(id: number): Promise<Branch | null> {
-  const [row] = await db()<Branch[]>`SELECT * FROM branches WHERE id = ${id}`;
+  const [row] = await db()<Branch[]>`SELECT * FROM review.branches WHERE id = ${id}`;
   return row ?? null;
 }
 
 export async function listActiveBranches(): Promise<Pick<Branch, "id" | "name">[]> {
   return db()<Pick<Branch, "id" | "name">[]>`
-    SELECT id, name FROM branches WHERE active ORDER BY name`;
+    SELECT id, name FROM review.branches WHERE active ORDER BY name`;
 }
 
 /** All branches with counts from the last `days` days. */
 export async function listBranchStats(days: number): Promise<BranchStats[]> {
   return db()<BranchStats[]>`
     SELECT b.*,
-      (SELECT count(*)::int FROM events e WHERE e.branch_id = b.id AND e.type = 'scan'
+      (SELECT count(*)::int FROM review.events e WHERE e.branch_id = b.id AND e.type = 'scan'
          AND e.created_at > now() - make_interval(days => ${days})) AS scans,
-      (SELECT count(*)::int FROM events e WHERE e.branch_id = b.id AND e.type = 'review_click'
+      (SELECT count(*)::int FROM review.events e WHERE e.branch_id = b.id AND e.type = 'review_click'
          AND e.created_at > now() - make_interval(days => ${days})) AS review_clicks,
-      (SELECT count(*)::int FROM vouchers v WHERE v.branch_id = b.id
+      (SELECT count(*)::int FROM review.vouchers v WHERE v.branch_id = b.id
          AND v.created_at > now() - make_interval(days => ${days})) AS vouchers_issued,
-      (SELECT count(*)::int FROM vouchers v WHERE v.branch_id = b.id
+      (SELECT count(*)::int FROM review.vouchers v WHERE v.branch_id = b.id
          AND v.redeemed_at > now() - make_interval(days => ${days})) AS vouchers_redeemed
-    FROM branches b
+    FROM review.branches b
     ORDER BY b.active DESC, b.name`;
 }
 
 export async function recordEvent(branchId: number, type: "scan" | "review_click"): Promise<void> {
-  await db()`INSERT INTO events (branch_id, type) VALUES (${branchId}, ${type})`;
+  await db()`INSERT INTO review.events (branch_id, type) VALUES (${branchId}, ${type})`;
 }
 
 /** Accepts either a full Google review link or a bare Place ID. */
