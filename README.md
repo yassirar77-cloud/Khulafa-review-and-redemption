@@ -38,7 +38,7 @@ You need Node.js 20+ and a Postgres database. [Supabase](https://supabase.com) f
 npm install
 cp .env.example .env        # then fill in the values
 npm run db:migrate          # creates the tables
-SEED_STAFF_PIN=4821 SEED_GOOGLE_PLACE_ID=<your Place ID> npm run db:seed   # creates "Khulafa Bistro"
+SEED_STAFF_PIN=4821 npm run db:seed   # creates "Khulafa Bistro" with its Google review link
 npm run dev                 # http://localhost:3000
 ```
 
