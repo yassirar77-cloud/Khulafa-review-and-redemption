@@ -56,7 +56,7 @@ describe("vouchers", { skip: !url && "TEST_DATABASE_URL not set" }, () => {
 
   before(async () => {
     const sql = db();
-    await sql`DROP TABLE IF EXISTS review.events, review.vouchers, review.branches CASCADE`;
+    await sql`DROP SCHEMA IF EXISTS review CASCADE`;
     await sql.unsafe(readFileSync(join(__dirname, "..", "db", "schema.sql"), "utf8"));
   });
 

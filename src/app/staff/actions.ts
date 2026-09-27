@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { checkPin } from "@/lib/auth";
 import { getBranchById } from "@/lib/branches";
 import { db } from "@/lib/db";
-import { maskPhone } from "@/lib/phone";
 import { endStaffSession, staffBranchId, startStaffSession } from "@/lib/session";
-import { formatDateTime, getVoucher, redeemVoucher, voucherProblem } from "@/lib/vouchers";
+import { previewVoucher, staffPath, type RedeemState } from "@/lib/staff";
+import { cleanCode, formatDateTime, redeemVoucher } from "@/lib/vouchers";
 
 const MAX_ATTEMPTS = 5;
 const LOCK_MINUTES = 15;
@@ -35,7 +35,8 @@ export async function staffLoginAction(_prev: LoginState, formData: FormData): P
 
   await db()`UPDATE review.branches SET failed_pin_attempts = 0, pin_locked_until = NULL WHERE id = ${branch.id}`;
   await startStaffSession(branch.id);
-  redirect("/staff");
+  // Continue to the voucher that was scanned before logging in, if any.
+  redirect(staffPath(String(formData.get("code") ?? "")));
 }
 
 export async function staffLogoutAction(): Promise<void> {
@@ -43,20 +44,7 @@ export async function staffLogoutAction(): Promise<void> {
   redirect("/staff");
 }
 
-export type VoucherPreview = {
-  code: string;
-  customerName: string;
-  phone: string;
-  reward: string;
-  created: string;
-  problem: string | null;
-};
-
-export type RedeemState = {
-  preview?: VoucherPreview;
-  error?: string;
-  success?: string;
-};
+export type { RedeemState } from "@/lib/staff";
 
 /** One action for both steps so each result replaces the previous one on screen. */
 export async function voucherAction(_prev: RedeemState, formData: FormData): Promise<RedeemState> {
@@ -66,26 +54,14 @@ export async function voucherAction(_prev: RedeemState, formData: FormData): Pro
 async function lookup(formData: FormData): Promise<RedeemState> {
   const branchId = await staffBranchId();
   if (!branchId) redirect("/staff");
-  const code = String(formData.get("code") ?? "");
-  const voucher = await getVoucher(code);
-  if (!voucher) return { error: "No voucher with that code. Check the letters and try again." };
-  return {
-    preview: {
-      code: voucher.code,
-      customerName: voucher.customer_name,
-      phone: maskPhone(voucher.phone),
-      reward: voucher.reward_text,
-      created: formatDateTime(voucher.created_at),
-      problem: voucherProblem(voucher, branchId),
-    },
-  };
+  return previewVoucher(branchId, String(formData.get("code") ?? ""));
 }
 
 async function redeem(formData: FormData): Promise<RedeemState> {
   const branchId = await staffBranchId();
   if (!branchId) redirect("/staff");
   const result = await redeemVoucher(branchId, String(formData.get("code") ?? ""));
-  if (!result.ok) return { error: result.error };
+  if (!result.ok) return { code: cleanCode(String(formData.get("code") ?? "")), error: result.error };
   return {
     success: `Redeemed ${result.voucher.code}: give ${result.voucher.customer_name} their ${result.voucher.reward_text.toLowerCase()}.`,
   };

@@ -3,11 +3,12 @@
 import { useActionState } from "react";
 import { staffLoginAction, type LoginState } from "./actions";
 
-export function StaffLogin({ branches }: { branches: { id: number; name: string }[] }) {
+export function StaffLogin({ branches, code }: { branches: { id: number; name: string }[]; code?: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(staffLoginAction, {});
 
   return (
     <form action={action} className="card">
+      {code && <input type="hidden" name="code" value={code} />}
       <label htmlFor="branchId">Branch</label>
       <select id="branchId" name="branchId" required defaultValue={branches.length === 1 ? branches[0].id : ""}>
         <option value="" disabled>Choose branch…</option>

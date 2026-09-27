@@ -1,6 +1,7 @@
 import { getBranchById, listActiveBranches } from "@/lib/branches";
 import { staffBranchId } from "@/lib/session";
-import { formatDateTime, listRecentVouchers } from "@/lib/vouchers";
+import { previewVoucher } from "@/lib/staff";
+import { cleanCode, formatDateTime, listRecentVouchers } from "@/lib/vouchers";
 import { staffLogoutAction } from "./actions";
 import { RedeemPanel } from "./RedeemPanel";
 import { StaffLogin } from "./StaffLogin";
@@ -8,7 +9,11 @@ import { StaffLogin } from "./StaffLogin";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Staff · Redeem vouchers" };
 
-export default async function StaffPage() {
+export default async function StaffPage({ searchParams }: { searchParams: Promise<{ code?: string }> }) {
+  // A scanned voucher QR opens /staff?code=123456. We only ever *check* the code
+  // here; redeeming still needs a logged-in cashier to tap Redeem.
+  const rawCode = (await searchParams).code;
+  const code = cleanCode(typeof rawCode === "string" ? rawCode : "").slice(0, 12);
   const branchId = await staffBranchId();
   const branch = branchId ? await getBranchById(branchId) : null;
 
@@ -18,14 +23,18 @@ export default async function StaffPage() {
       <main className="page">
         <div className="hero">
           <h1>Staff login</h1>
-          <p>Redeem customer vouchers</p>
+          <p>{code ? `Log in to check voucher ${code}` : "Redeem customer vouchers"}</p>
         </div>
-        <StaffLogin branches={branches} />
+        <StaffLogin branches={branches} code={code} />
       </main>
     );
   }
 
-  const recent = (await listRecentVouchers(50, branch.id)).filter((v) => v.redeemed_at);
+  const [initial, recentAll] = await Promise.all([
+    code ? previewVoucher(branch.id, code) : Promise.resolve({}),
+    listRecentVouchers(50, branch.id),
+  ]);
+  const recent = recentAll.filter((v) => v.redeemed_at);
 
   return (
     <main className="page">
@@ -35,7 +44,7 @@ export default async function StaffPage() {
           <button className="btn btn-secondary btn-small">Log out</button>
         </form>
       </div>
-      <RedeemPanel />
+      <RedeemPanel key={code} initial={initial} />
 
       <section className="card">
         <h2>Recently redeemed</h2>

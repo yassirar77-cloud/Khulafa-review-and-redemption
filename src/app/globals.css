@@ -89,6 +89,8 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(
   font-size: 40px; letter-spacing: 6px; font-weight: 700;
   background: #fff; color: var(--brand); border-radius: 12px; padding: 10px; margin: 16px 0;
 }
+.voucher-qr { background: #fff; border-radius: 12px; padding: 8px; margin: 0 auto 16px; max-width: 280px; }
+.voucher-qr svg { display: block; width: 100%; height: auto; }
 .voucher.used { background: #8d837c; }
 .voucher.used .code { color: #8d837c; text-decoration: line-through; }
 

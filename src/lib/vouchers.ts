@@ -2,8 +2,8 @@ import { randomInt } from "crypto";
 import { db } from "./db";
 import { normalizePhone } from "./phone";
 
-// No 0/O, 1/I/L so codes are easy to read out at the counter.
-const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+// New codes are 6 digits so cashiers can type them on a numeric keypad.
+// Older vouchers used letters too (e.g. "K48MQ8"); cleanCode() still accepts those.
 const CODE_LENGTH = 6;
 
 export type Voucher = {
@@ -29,9 +29,7 @@ export type RedeemResult =
   | { ok: false; error: string };
 
 export function generateCode(): string {
-  let code = "";
-  for (let i = 0; i < CODE_LENGTH; i++) code += ALPHABET[randomInt(ALPHABET.length)];
-  return code;
+  return String(randomInt(10 ** CODE_LENGTH)).padStart(CODE_LENGTH, "0");
 }
 
 export function cleanCode(input: string): string {
@@ -76,7 +74,7 @@ export async function claimVoucher(
       }
     }
 
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 10; attempt++) {
       const code = generateCode();
       const rows = await sql<{ code: string }[]>`
         INSERT INTO review.vouchers (code, branch_id, customer_name, phone, reward_text, expires_at)

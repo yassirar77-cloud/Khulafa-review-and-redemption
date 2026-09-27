@@ -5,7 +5,7 @@ Customers scan a QR code at the table and land on a page for their branch. The p
 1. **Review us on Google**: a button that opens the branch's Google review form.
 2. **Free drink on us**: they enter a name and phone number and get a voucher code to show at the counter.
 
-Staff check and redeem codes at `/staff` with a branch PIN. The owner manages branches, prints QR posters and sees the numbers at `/admin`.
+The voucher screen shows a 6-digit code and a QR code. Staff scan the QR (or type the code) at `/staff`, log in with the branch PIN, and tap **Redeem**. The owner manages branches, prints QR posters and sees the numbers at `/admin`.
 
 ## About Google's review rules
 
@@ -18,8 +18,9 @@ So this app keeps the two separate. Every customer who scans can claim the drink
 | Page | Who | What |
 | --- | --- | --- |
 | `/r/<branch>` | Customers (QR code) | Google review button + free drink claim |
-| `/v/<code>` | Customers | Their voucher, to show at the counter |
+| `/v/<code>` | Customers | Their voucher code and QR, to show at the counter |
 | `/staff` | Cashier | Log in with branch PIN, check and redeem codes |
+| `/staff?code=<code>` | Cashier (scanned from voucher QR) | Checks that code straight away; staff still tap Redeem |
 | `/admin` | Owner | Stats, add or edit branches, print QR posters |
 
 ## Rules built in
@@ -27,6 +28,8 @@ So this app keeps the two separate. Every customer who scans can claim the drink
 - One voucher per phone number per branch, then a waiting period (default 30 days, set per branch). If someone claims again while their voucher is still unused, they get the same code back.
 - Vouchers expire (default 24 hours) and only work at the branch they were claimed at.
 - A code can only be redeemed once, even if two tills try at the same moment.
+- Scanning a voucher QR never redeems it by itself: the cashier must be logged in and tap **Redeem**. If they aren't logged in, they see the PIN login first and then return to the same code.
+- New codes are 6 digits, typed on a number keypad. Older codes with letters (from before this change) still work.
 - 5 wrong staff PINs lock that branch's login for 15 minutes.
 - Phone numbers are masked (last 4 digits) on staff and admin screens.
 
@@ -70,4 +73,12 @@ All tables live in a separate `review` schema, so the app can share a Supabase d
 TEST_DATABASE_URL=postgres://postgres@localhost:5432/khulafa_test npm test
 ```
 
-The voucher tests need an empty throwaway database; they drop and recreate the tables.
+These tests need an empty throwaway database; they drop and recreate the `review` schema.
+
+A browser test of the QR → `/staff?code=` flow runs against a running app. It claims and redeems a real voucher, so point it at a local or test copy:
+
+```bash
+E2E_BASE_URL=http://localhost:3000 E2E_STAFF_PIN=4821 npm run test:e2e
+```
+
+Set `CHROMIUM_PATH` if Playwright can't find a browser on its own.
