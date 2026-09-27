@@ -1,5 +1,6 @@
 import { randomInt } from "crypto";
 import { db } from "./db";
+import { cleanCode } from "./code";
 import { normalizePhone } from "./phone";
 
 // New codes are 6 digits so cashiers can type them on a numeric keypad.
@@ -32,9 +33,7 @@ export function generateCode(): string {
   return String(randomInt(10 ** CODE_LENGTH)).padStart(CODE_LENGTH, "0");
 }
 
-export function cleanCode(input: string): string {
-  return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
-}
+export { cleanCode };
 
 export async function claimVoucher(
   branchSlug: string,

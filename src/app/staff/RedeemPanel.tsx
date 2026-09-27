@@ -1,18 +1,30 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { voucherAction, type RedeemState } from "./actions";
+import { QrScanner } from "./QrScanner";
 
 /** `initial` is the already-checked voucher when the page was opened from a scanned QR. */
 export function RedeemPanel({ initial = {} }: { initial?: RedeemState }) {
   const [state, action, pending] = useActionState<RedeemState, FormData>(voucherAction, initial);
+  // Controlled so the code stays visible after "Check code" (React resets
+  // uncontrolled fields once a form action finishes).
+  const [code, setCode] = useState(initial.code ?? "");
   const codeInput = useRef<HTMLInputElement>(null);
+  const lookupForm = useRef<HTMLFormElement>(null);
+
+  // A scanned code runs "Check code" straight away; Redeem is still a separate tap.
+  function onScanned(scanned: string) {
+    flushSync(() => setCode(scanned));
+    lookupForm.current?.requestSubmit();
+  }
 
   // After a successful redemption, clear the box ready for the next customer
   // and drop ?code= so a refresh doesn't reopen the voucher just used.
   useEffect(() => {
     if (state.success && codeInput.current) {
-      codeInput.current.value = "";
+      setCode("");
       codeInput.current.focus();
       if (window.location.search) window.history.replaceState(null, "", "/staff");
     }
@@ -23,7 +35,9 @@ export function RedeemPanel({ initial = {} }: { initial?: RedeemState }) {
   return (
     <section className="card">
       <h2>Redeem a voucher</h2>
-      <form action={action}>
+      <QrScanner onCode={onScanned} disabled={pending} />
+      <p className="or-divider">or type the code</p>
+      <form ref={lookupForm} action={action}>
         <input type="hidden" name="intent" value="lookup" />
         <label htmlFor="code">Voucher code</label>
         <input
@@ -33,9 +47,10 @@ export function RedeemPanel({ initial = {} }: { initial?: RedeemState }) {
           inputMode="numeric"
           autoComplete="off"
           placeholder="e.g. 482913"
-          defaultValue={initial.code ?? ""}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
           required
-          style={{ fontFamily: "ui-monospace, monospace", letterSpacing: 3, textTransform: "uppercase" }}
+          style={{ fontFamily: "ui-monospace, monospace", letterSpacing: 3 }}
         />
         <div className="form-actions">
           <button className="btn" disabled={pending}>{pending ? "Checking…" : "Check code"}</button>
