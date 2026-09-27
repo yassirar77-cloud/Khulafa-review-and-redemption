@@ -1,3 +1,4 @@
+import { Logo } from "@/components/Logo";
 import { notFound } from "next/navigation";
 import { getBranchBySlug, recordEvent } from "@/lib/branches";
 import { ClaimForm } from "./ClaimForm";
@@ -14,7 +15,7 @@ export default async function BranchPage({ params }: { params: Promise<{ slug: s
   return (
     <main className="page">
       <div className="hero">
-        <div className="logo">{branch.name.charAt(0)}</div>
+        <Logo />
         <h1>{branch.name}</h1>
         <p>Thank you for dining with us!</p>
       </div>

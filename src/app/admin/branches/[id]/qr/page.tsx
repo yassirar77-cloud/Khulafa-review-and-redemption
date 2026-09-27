@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
+import { Logo } from "@/components/Logo";
 import { getBranchById } from "@/lib/branches";
 import { requireAdmin } from "@/lib/session";
 import { publicBaseUrl } from "@/lib/url";
@@ -29,6 +30,7 @@ export default async function QrPosterPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="poster">
+        <Logo size={96} className="poster-logo" />
         <h1>{branch.name}</h1>
         <div className="headline">🥤 {branch.reward_text} on us!</div>
         <p className="muted" style={{ margin: 0 }}>Scan to claim, and tell us how we did on Google</p>

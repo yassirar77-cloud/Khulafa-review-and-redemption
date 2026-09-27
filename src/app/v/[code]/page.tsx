@@ -1,3 +1,4 @@
+import { Logo } from "@/components/Logo";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { ReviewButton } from "@/components/ReviewButton";
@@ -30,7 +31,7 @@ export default async function VoucherPage({ params }: { params: Promise<{ code: 
   return (
     <main className="page">
       <div className="hero">
-        <div className="logo">{voucher.branch_name.charAt(0)}</div>
+        <Logo />
         <h1>{voucher.branch_name}</h1>
         <p>Hi {voucher.customer_name}, here is your voucher</p>
       </div>

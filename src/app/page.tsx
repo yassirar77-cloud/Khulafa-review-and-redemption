@@ -1,10 +1,11 @@
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="page">
       <div className="hero">
-        <div className="logo">K</div>
+        <Logo />
         <h1>Khulafa Bistro</h1>
         <p>Scan the QR code at your table to claim your free drink.</p>
       </div>
