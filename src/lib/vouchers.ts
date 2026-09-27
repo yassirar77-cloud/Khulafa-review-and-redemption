@@ -19,7 +19,11 @@ export type Voucher = {
   redeemed_at: Date | null;
 };
 
-export type VoucherWithBranch = Voucher & { branch_name: string; branch_slug: string };
+export type VoucherWithBranch = Voucher & {
+  branch_name: string;
+  branch_slug: string;
+  branch_review_url: string;
+};
 
 export type ClaimResult =
   | { ok: true; code: string; existing: boolean }
@@ -90,7 +94,7 @@ export async function claimVoucher(
 export async function getVoucher(codeInput: string): Promise<VoucherWithBranch | null> {
   const code = cleanCode(codeInput);
   const [row] = await db()<VoucherWithBranch[]>`
-    SELECT v.*, b.name AS branch_name, b.slug AS branch_slug
+    SELECT v.*, b.name AS branch_name, b.slug AS branch_slug, b.google_review_url AS branch_review_url
     FROM review.vouchers v JOIN review.branches b ON b.id = v.branch_id
     WHERE v.code = ${code}`;
   return row ?? null;
@@ -120,7 +124,7 @@ export async function redeemVoucher(branchId: number, codeInput: string): Promis
 
 export async function listRecentVouchers(limit: number, branchId?: number): Promise<VoucherWithBranch[]> {
   return db()<VoucherWithBranch[]>`
-    SELECT v.*, b.name AS branch_name, b.slug AS branch_slug
+    SELECT v.*, b.name AS branch_name, b.slug AS branch_slug, b.google_review_url AS branch_review_url
     FROM review.vouchers v JOIN review.branches b ON b.id = v.branch_id
     ${branchId ? db()`WHERE v.branch_id = ${branchId}` : db()``}
     ORDER BY v.created_at DESC LIMIT ${limit}`;

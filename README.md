@@ -1,9 +1,9 @@
 # Khulafa Bistro: QR review & free drink
 
-Customers scan a QR code at the table and land on a page for their branch. The page does two things:
+Customers scan a QR code at the table and land on a page for their branch:
 
-1. **Review us on Google**: a button that opens the branch's Google review form.
-2. **Free drink on us**: they enter a name and phone number and get a voucher code to show at the counter.
+1. **Free drink on us**: they enter a name and phone number and get a voucher to show at the counter.
+2. **Review us on Google**: the voucher screen then shows, under the voucher QR, "While you wait, tell us how we did on Google" with a button to the branch's Google review form. It's marked optional; the drink is theirs either way.
 
 The voucher screen shows a 6-digit code and a QR code. At `/staff` the cashier logs in with the branch PIN, taps **Scan QR** to read the customer's QR with the phone's back camera (or types the code), then taps **Redeem**. The owner manages branches, prints QR posters and sees the numbers at `/admin`.
 
@@ -11,14 +11,14 @@ The voucher screen shows a 6-digit code and a QR code. At `/staff` the cashier l
 
 Google's policy doesn't allow offering rewards **in exchange for** reviews. If Google spots it, it can remove your reviews or suspend your Business Profile. Also, nobody can check whether a customer actually posted a review, because Google offers no way to do that.
 
-So this app keeps the two separate. Every customer who scans can claim the drink, and the page says "No review needed". The Google button sits next to it, and people who enjoyed their meal tend to use it. Keep the wording on your posters and signs the same: "Free drink, and tell us how we did on Google", not "Review us to get a free drink".
+So this app keeps the two separate. Every customer who scans can claim the drink, and the page says "No review needed". The Google button only appears afterwards, on the voucher, marked as optional, and people who enjoyed their meal tend to use it. Keep the wording on your posters and signs the same: "Free drink, and tell us how we did on Google", not "Review us to get a free drink".
 
 ## Pages
 
 | Page | Who | What |
 | --- | --- | --- |
-| `/r/<branch>` | Customers (QR code) | Google review button + free drink claim |
-| `/v/<code>` | Customers | Their voucher code and QR, to show at the counter |
+| `/r/<branch>` | Customers (QR code) | Free drink claim |
+| `/v/<code>` | Customers | Their voucher code and QR to show at the counter, plus an optional Google review button |
 | `/staff` | Cashier | Log in with branch PIN, check and redeem codes |
 | `/staff?code=<code>` | Cashier (scanned from voucher QR) | Checks that code straight away; staff still tap Redeem |
 | `/admin` | Owner | Stats, add or edit branches, print QR posters |

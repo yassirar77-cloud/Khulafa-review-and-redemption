@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getBranchBySlug, recordEvent } from "@/lib/branches";
 import { ClaimForm } from "./ClaimForm";
-import { ReviewButton } from "./ReviewButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,17 +18,6 @@ export default async function BranchPage({ params }: { params: Promise<{ slug: s
         <h1>{branch.name}</h1>
         <p>Thank you for dining with us!</p>
       </div>
-
-      {branch.google_review_url && (
-        <section className="card">
-          <h2>⭐ How was your visit?</h2>
-          <p className="muted">
-            Your honest feedback on Google, good or bad, helps us improve and helps other
-            diners find us.
-          </p>
-          <ReviewButton slug={branch.slug} url={branch.google_review_url} />
-        </section>
-      )}
 
       <section className="card">
         <h2>🥤 {branch.reward_text} on us</h2>

@@ -91,6 +91,9 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(
 }
 .voucher-qr { background: #fff; border-radius: 12px; padding: 8px; margin: 0 auto 16px; max-width: 280px; }
 .voucher-qr svg { display: block; width: 100%; height: auto; }
+.voucher-review { border-top: 1px solid rgba(255, 255, 255, 0.3); margin-top: 16px; padding-top: 16px; }
+.voucher-review p { margin: 0 0 10px; }
+.voucher-review p.small { margin: 8px 0 0; opacity: 0.85; }
 .voucher.used { background: #8d837c; }
 .voucher.used .code { color: #8d837c; text-decoration: line-through; }
 

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
+import { ReviewButton } from "@/components/ReviewButton";
 import { staffPath } from "@/lib/staff";
 import { publicBaseUrl } from "@/lib/url";
 import { formatDateTime, getVoucher } from "@/lib/vouchers";
@@ -56,6 +57,13 @@ export default async function VoucherPage({ params }: { params: Promise<{ code: 
             <br />
             Valid until {formatDateTime(voucher.expires_at)}.
           </p>
+        )}
+        {!expired && voucher.branch_review_url && (
+          <div className="voucher-review">
+            <p>While you wait, tell us how we did on Google</p>
+            <ReviewButton slug={voucher.branch_slug} url={voucher.branch_review_url} />
+            <p className="small">Optional. Your {voucher.reward_text.toLowerCase()} is yours either way.</p>
+          </div>
         )}
       </div>
 
