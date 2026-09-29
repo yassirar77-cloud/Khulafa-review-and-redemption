@@ -20,6 +20,7 @@ export default async function EditBranchPage({ params }: { params: Promise<{ id:
           slug: branch.slug,
           google_review_url: branch.google_review_url,
           reward_text: branch.reward_text,
+          reward_note: branch.reward_note,
           voucher_valid_hours: branch.voucher_valid_hours,
           cooldown_days: branch.cooldown_days,
           active: branch.active,

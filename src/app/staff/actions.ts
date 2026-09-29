@@ -62,7 +62,8 @@ async function redeem(formData: FormData): Promise<RedeemState> {
   if (!branchId) redirect("/staff");
   const result = await redeemVoucher(branchId, String(formData.get("code") ?? ""));
   if (!result.ok) return { code: cleanCode(String(formData.get("code") ?? "")), error: result.error };
+  const what = String(formData.get("reward_note") ?? "").trim() || result.voucher.reward_text.toLowerCase();
   return {
-    success: `Redeemed ${result.voucher.code}: give ${result.voucher.customer_name} their ${result.voucher.reward_text.toLowerCase()}.`,
+    success: `Redeemed ${result.voucher.code}: give ${result.voucher.customer_name} their ${what}.`,
   };
 }

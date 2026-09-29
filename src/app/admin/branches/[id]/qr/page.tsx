@@ -33,6 +33,7 @@ export default async function QrPosterPage({ params }: { params: Promise<{ id: s
         <Logo size={96} className="poster-logo" />
         <h1>{branch.name}</h1>
         <div className="headline">🥤 {branch.reward_text} on us!</div>
+        {branch.reward_note && <div className="reward-note">{branch.reward_note}</div>}
         <p className="muted" style={{ margin: 0 }}>Scan to claim, and tell us how we did on Google</p>
         <div className="qr" dangerouslySetInnerHTML={{ __html: svg }} />
         <ol className="steps">

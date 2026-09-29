@@ -6,6 +6,7 @@ export type VoucherPreview = {
   customerName: string;
   phone: string;
   reward: string;
+  rewardNote: string;
   created: string;
   problem: string | null;
 };
@@ -32,6 +33,7 @@ export async function previewVoucher(branchId: number, codeInput: string): Promi
       customerName: voucher.customer_name,
       phone: maskPhone(voucher.phone),
       reward: voucher.reward_text,
+      rewardNote: voucher.branch_reward_note,
       created: formatDateTime(voucher.created_at),
       problem: voucherProblem(voucher, branchId),
     },

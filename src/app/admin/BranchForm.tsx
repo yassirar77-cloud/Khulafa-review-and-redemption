@@ -10,6 +10,7 @@ export type BranchFormValues = {
   slug: string;
   google_review_url: string;
   reward_text: string;
+  reward_note: string;
   voucher_valid_hours: number;
   cooldown_days: number;
   active: boolean;
@@ -45,6 +46,10 @@ export function BranchForm({ branch }: { branch: BranchFormValues }) {
 
       <label htmlFor="reward_text">Reward</label>
       <input id="reward_text" name="reward_text" defaultValue={branch.reward_text} placeholder="Free drink" />
+
+      <label htmlFor="reward_note">Reward details</label>
+      <input id="reward_note" name="reward_note" defaultValue={branch.reward_note} placeholder="Sirap Ais or Teh O Ais" maxLength={80} />
+      <p className="hint">Shown to customers and staff so everyone knows exactly what the reward is. Leave empty if any drink is fine.</p>
 
       <label htmlFor="voucher_valid_hours">Voucher valid for (hours)</label>
       <input id="voucher_valid_hours" name="voucher_valid_hours" type="number" min={1} defaultValue={branch.voucher_valid_hours} required />

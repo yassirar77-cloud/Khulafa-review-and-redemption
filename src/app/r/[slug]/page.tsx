@@ -22,6 +22,7 @@ export default async function BranchPage({ params }: { params: Promise<{ slug: s
 
       <section className="card">
         <h2>🥤 {branch.reward_text} on us</h2>
+        {branch.reward_note && <p className="reward-note">Choose one: {branch.reward_note}</p>}
         <p className="muted">
           Enter your name and phone number to get your voucher, then show it at the counter.
           No review needed.

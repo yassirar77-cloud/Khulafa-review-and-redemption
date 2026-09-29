@@ -14,6 +14,7 @@ export default async function NewBranchPage() {
           slug: "",
           google_review_url: "",
           reward_text: "Free drink",
+          reward_note: "",
           voucher_valid_hours: 24,
           cooldown_days: 30,
           active: true,

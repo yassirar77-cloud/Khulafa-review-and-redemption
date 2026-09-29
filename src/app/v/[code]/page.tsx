@@ -38,6 +38,7 @@ export default async function VoucherPage({ params }: { params: Promise<{ code: 
 
       <div className={`voucher${used ? " used" : ""}`}>
         <p className="reward">🥤 {voucher.reward_text}</p>
+        {voucher.branch_reward_note && <p className="reward-note">{voucher.branch_reward_note}, your choice</p>}
         <div className="code">{voucher.code}</div>
         {qrSvg && (
           <div

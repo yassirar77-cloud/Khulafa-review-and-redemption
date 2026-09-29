@@ -66,6 +66,12 @@ export function RedeemPanel({ initial = {} }: { initial?: RedeemState }) {
             {preview.customerName} · {preview.phone}
             <br />
             <span className="muted small">{preview.reward} · claimed {preview.created}</span>
+            {preview.rewardNote && (
+              <>
+                <br />
+                <strong>Give: {preview.rewardNote}</strong>
+              </>
+            )}
           </p>
           {preview.problem ? (
             <div className="alert alert-error">{preview.problem}</div>
@@ -73,6 +79,7 @@ export function RedeemPanel({ initial = {} }: { initial?: RedeemState }) {
             <form action={action}>
               <input type="hidden" name="intent" value="redeem" />
               <input type="hidden" name="code" value={preview.code} />
+              <input type="hidden" name="reward_note" value={preview.rewardNote} />
               <div className="form-actions">
                 <button className="btn" disabled={pending}>
                   {pending ? "Redeeming…" : `Redeem ${preview.reward.toLowerCase()}`}

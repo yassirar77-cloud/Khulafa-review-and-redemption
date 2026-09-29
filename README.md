@@ -66,7 +66,7 @@ All tables live in a separate `review` schema, so the app can share a Supabase d
 
 ## Adding more branches
 
-`/admin` → **+ Add branch**. Give it a name, its own Google review link and a staff PIN, then print its QR poster. Each branch gets its own link (`/r/<link-name>`), its own stats, and its own staff PIN. Vouchers only work at the branch they came from.
+`/admin` → **+ Add branch**. Give it a name, its own Google review link and a staff PIN, then print its QR poster. **Reward details** (for example "Sirap Ais or Teh O Ais") is shown to customers on the claim page, voucher and poster, and to the cashier at redeem time, so everyone knows exactly what the free drink is. Each branch gets its own link (`/r/<link-name>`), its own stats, and its own staff PIN. Vouchers only work at the branch they came from.
 
 ## Tests
 

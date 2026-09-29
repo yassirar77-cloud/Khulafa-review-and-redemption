@@ -32,6 +32,7 @@ export async function saveBranchAction(_prev: FormState, formData: FormData): Pr
   const slug = slugify(String(formData.get("slug") ?? "") || name);
   const reviewUrl = toGoogleReviewUrl(String(formData.get("google") ?? ""));
   const rewardText = String(formData.get("reward_text") ?? "").trim() || "Free drink";
+  const rewardNote = String(formData.get("reward_note") ?? "").trim().slice(0, 80);
   const validHours = Number(formData.get("voucher_valid_hours"));
   const cooldownDays = Number(formData.get("cooldown_days"));
   const pin = String(formData.get("pin") ?? "").trim();
@@ -56,7 +57,7 @@ export async function saveBranchAction(_prev: FormState, formData: FormData): Pr
       await db()`
         UPDATE review.branches SET
           name = ${name}, slug = ${slug}, google_review_url = ${reviewUrl},
-          reward_text = ${rewardText}, voucher_valid_hours = ${validHours},
+          reward_text = ${rewardText}, reward_note = ${rewardNote}, voucher_valid_hours = ${validHours},
           cooldown_days = ${cooldownDays}, active = ${active},
           staff_pin_hash = COALESCE(${pinHash}, staff_pin_hash),
           failed_pin_attempts = CASE WHEN ${pinHash}::text IS NULL THEN failed_pin_attempts ELSE 0 END,
@@ -64,9 +65,9 @@ export async function saveBranchAction(_prev: FormState, formData: FormData): Pr
         WHERE id = ${id}`;
     } else {
       await db()`
-        INSERT INTO review.branches (name, slug, google_review_url, reward_text, voucher_valid_hours,
+        INSERT INTO review.branches (name, slug, google_review_url, reward_text, reward_note, voucher_valid_hours,
                               cooldown_days, staff_pin_hash, active)
-        VALUES (${name}, ${slug}, ${reviewUrl}, ${rewardText}, ${validHours},
+        VALUES (${name}, ${slug}, ${reviewUrl}, ${rewardText}, ${rewardNote}, ${validHours},
                 ${cooldownDays}, ${pinHash}, ${active})`;
     }
   } catch (err) {

@@ -6,6 +6,7 @@ export type Branch = {
   name: string;
   google_review_url: string;
   reward_text: string;
+  reward_note: string;
   voucher_valid_hours: number;
   cooldown_days: number;
   staff_pin_hash: string | null;

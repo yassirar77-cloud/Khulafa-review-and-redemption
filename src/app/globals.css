@@ -81,6 +81,9 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(
   padding: 24px 20px; text-align: center; margin-top: 16px; position: relative;
 }
 .voucher .reward { font-size: 22px; font-weight: 700; margin: 0; }
+.voucher .reward-note { margin: 4px 0 0; font-size: 16px; opacity: 0.95; }
+.card .reward-note { font-weight: 600; margin: -4px 0 12px; }
+.poster .reward-note { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
 .voucher .code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 40px; letter-spacing: 6px; font-weight: 700;

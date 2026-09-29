@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS review.branches (
   name                TEXT NOT NULL,
   google_review_url   TEXT NOT NULL DEFAULT '',
   reward_text         TEXT NOT NULL DEFAULT 'Free drink',
+  reward_note         TEXT NOT NULL DEFAULT '',
   voucher_valid_hours INTEGER NOT NULL DEFAULT 24 CHECK (voucher_valid_hours > 0),
   cooldown_days       INTEGER NOT NULL DEFAULT 30 CHECK (cooldown_days >= 0),
   staff_pin_hash      TEXT,
@@ -18,6 +19,9 @@ CREATE TABLE IF NOT EXISTS review.branches (
   active              BOOLEAN NOT NULL DEFAULT TRUE,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Added after launch; keeps older databases in step with the table above.
+ALTER TABLE review.branches ADD COLUMN IF NOT EXISTS reward_note TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS review.vouchers (
   id            SERIAL PRIMARY KEY,
